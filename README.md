@@ -1,176 +1,212 @@
-#  REST API для управления задачами (Go)
-API для управления задачами. Позволяет авторизоваться, создавать, получать, обновлять и удалять задачи.  
+# Go REST API Starter — JWT, PostgreSQL, Swagger, тесты и мониторинг
 
-## 🏗 Архитектура проекта REST API для управления задачами
+Практический backend-проект на **Go**, который показывает, как построить REST API с авторизацией, PostgreSQL, Swagger/OpenAPI, тестированием и мониторингом.
 
-### 📌 Общая концепция
+Проект можно использовать не только как пример CRUD-приложения, но и как **готовую основу для изучения Go backend-разработки или создания собственного REST API**.
 
-Проект реализует **многослойную архитектуру** для REST API, позволяющего:
-- авторизоваться,  
-- создавать, получать, обновлять и удалять задачи.  
+## 🎯 Что вы получите, изучив проект
 
-Каждый слой отвечает за свою область ответственности, что упрощает поддержку и масштабирование кода.
+Репозиторий помогает на практике разобраться, как устроен современный backend-сервис на Go.
 
+После изучения проекта вы сможете лучше понимать:
 
-### 🧩 Слои приложения
+* как организовать REST API на Go;
+* как разделить HTTP-обработчики и бизнес-логику;
+* как реализовать JWT-аутентификацию;
+* как работать с PostgreSQL;
+* как организовать CRUD-операции;
+* как валидировать входящие данные;
+* как документировать API через Swagger/OpenAPI;
+* как писать unit-тесты с использованием mock-объектов;
+* как создавать интеграционные тесты;
+* как запускать приложение и инфраструктуру через Docker;
+* как выполнять миграции базы данных;
+* как подключать Prometheus и Grafana для мониторинга;
+* как организовать проект так, чтобы его было проще расширять и тестировать.
 
-#### 1. **Модели (Model Layer)**
-- Описывают основные сущности приложения: **задачи (`Task`)**, **пользователи (`User`)**.  
-- 📂 `internal/models/`
+### Кому будет полезен проект
 
-#### 2. **Сервисный слой (Service Layer)**
-- Реализует бизнес-логику приложения.  
-- Включает методы для работы с задачами и пользователями (CRUD).  
-- **Доступ к данным встроен в сервисный слой** — сервисы напрямую работают с PostgreSQL через SQL-запросы.  
-- Примеры: `PostgresTaskService`, `PostgresUserService`.  
-- 📂 `internal/services/`
+**Начинающим Go-разработчикам**
 
-#### 3. **Обработчики HTTP-запросов (Handler Layer / API Layer)**
-- Принимают и обрабатывают HTTP-запросы.  
-- Делают валидацию данных, авторизацию, вызывают сервисы, формируют ответы.  
-- 📂 `internal/server/`
+Можно использовать репозиторий как практический пример backend-приложения и изучать устройство проекта по слоям.
 
-#### 4. **Конфигурация и утилиты**
-- Настройки приложения, подключение к базе, работа с переменными окружения.  
-- 📂 `internal/config/`, `configs/`, `cmd/utils/`
+**Разработчикам, изучающим REST API**
 
-#### 5. **Тесты**
-- **Unit-тесты** — проверяют бизнес-логику сервисов (с моками).  
-- **Интеграционные тесты** — тестируют весь API, включая работу с реальной базой.  
-- 📂 `internal/services/unit/` (unit), `internal/services/integration_test/` (integration), `internal/seed/` (тестовые данные)
+Проект показывает полный путь от HTTP-запроса до сохранения данных в PostgreSQL.
 
-#### 6. **Миграции**
-- SQL-скрипты для управления структурой базы данных.  
-- 📂 `migrations/`
+**Тем, кто собирает портфолио**
 
-#### 7. **Документация**
-- Swagger/OpenAPI — описание API.  
-- `README.md` — примеры запуска и использования.  
-- 📂 `docs/`, `README.md`
+Репозиторий демонстрирует не только CRUD, но и аутентификацию, тестирование, документацию, миграции и мониторинг.
 
-#### 8. **Мониторинг**
-- Интеграция с **Prometheus** и **Grafana** для метрик и визуализации.  
-- 📂 `monitoring/`, `prometheus.yml`
+**Тем, кто хочет создать собственный Go-сервис**
 
-### 🔄 Взаимодействие слоёв
-```
-HTTP-запрос
-↓
-[Handler Layer]
-↓
-[Service Layer (бизнес-логика + доступ к данным)]
-↓
-[База данных (PostgreSQL)]
- ```
+Проект можно использовать как отправную точку для API с пользователями, авторизацией и работой с PostgreSQL.
 
-## 📂 Структура проекта
-```
-├── .github
-│   └── workflows
-│       └── go.yml
-├── cmd
-│   ├── main.go
-│   └── utils
-│       └── config_printer.go
-├── configs
-│   └── config.yaml
-├── docker-compose.yml
-├── Dockerfile
-├── docs
-│   ├── docs.go
-│   ├── swagger.json
-│   └── swagger.yaml
-├── go.mod
-├── go.sum
-├── Insomnia_2025-08-23.yaml
-├── internal
-│   ├── auth
-│   │   └── jwt.go
-│   ├── config
-│   │   └── config.go
-│   ├── models
-│   │   ├── task.go
-│   │   └── user.go
-│   ├── repositories
-│   │   └── user_repo.go
-│   ├── seed
-│   │   └── seed.go
-│   ├── server
-│   │   ├── auth_handlers.go
-│   │   ├── server.go
-│   │   └── server_test.go
-│   └── services
-│       ├── auth_service.go
-│       ├── auth_service_mock.go
-│       ├── integration_test
-│       │   ├── full_integration_test.go
-│       │   └── task_service_integration_test.go
-│       ├── task_service.go
-│       ├── task_service_mock.go
-│       └── unit
-│           ├── mock_auth_service_mock.go
-│           └── mock_task_service_test.go
-├── LICENSE
-├── Makefile
-├── migrations
-│   ├── 002_create_users_table.down.sql
-│   ├── 002_create_users_table.up.sql
-│   ├── 003_create_tasks_table.down.sql
-│   └── 003_create_tasks_table.up.sql
-├── monitoring
-│   ├── dashboards
-│   │   ├── provisioning
-│   │   │   └── dashboards
-│   │   │       └── dashboard.yml
-│   │   └── rest_api_dashboard.json
-│   └── prometheus.yml
-├── prometheus.yml
-├── README.md
-├── screenshots
-│   ├── create_task_request.png
-│   ├── get_tasks_request.png
-│   └── login_request.png
-└── tests
+---
+
+# 🚀 Что реализовано
+
+Проект предоставляет REST API для работы с пользователями и задачами.
+
+Основные возможности:
+
+* регистрация/работа с пользователями;
+* JWT-аутентификация;
+* создание задач;
+* получение задач пользователя;
+* обновление задач;
+* удаление задач;
+* валидация входящих данных;
+* работа с PostgreSQL;
+* миграции базы данных;
+* Swagger/OpenAPI;
+* unit-тесты;
+* интеграционные тесты;
+* Prometheus;
+* Grafana;
+* Docker Compose.
+
+---
+
+# 🏗 Архитектура
+
+Проект построен с разделением ответственности между основными компонентами приложения.
+
+```text
+                    HTTP-запрос
+                         │
+                         ▼
+                ┌─────────────────┐
+                │  HTTP Handlers  │
+                │   validation    │
+                │ authentication  │
+                └────────┬────────┘
+                         │
+                         ▼
+                ┌─────────────────┐
+                │     Services    │
+                │  бизнес-логика  │
+                └────────┬────────┘
+                         │
+                         ▼
+                ┌─────────────────┐
+                │   PostgreSQL    │
+                └─────────────────┘
 ```
 
-## Запуск сервера приложения
+Такое разделение позволяет отдельно развивать HTTP-слой, бизнес-логику и работу с данными.
 
-Для запуска сервера используйте команду:
+## Основные компоненты
 
-```bash
-go run ./cmd/main.go
-```
-Пример вывода в консоли:
-```
-2025/08/23 14:15:03 Пользователи загружены
-Starting application...
-```
-## REST API
-### Login
-Метод: `POST /login`
-Описание: Авторизация пользователя для получения JWT-токена.
+### HTTP API
 
-Тело запроса:
+📂 `internal/server/`
+
+Обрабатывает HTTP-запросы, выполняет валидацию, проверяет авторизацию и формирует JSON-ответы.
+
+### Аутентификация
+
+📂 `internal/auth/`
+
+JWT используется для подтверждения личности пользователя при обращении к защищённым endpoint'ам.
+
+### Бизнес-логика
+
+📂 `internal/services/`
+
+Содержит операции, связанные с пользователями и задачами.
+
+### Модели
+
+📂 `internal/models/`
+
+Описывает основные сущности приложения:
+
+* `User`;
+* `Task`.
+
+### База данных
+
+📂 `migrations/`
+
+SQL-миграции используются для создания и изменения структуры PostgreSQL.
+
+### Тестирование
+
+В проекте присутствуют:
+
+* unit-тесты;
+* mock-тесты;
+* интеграционные тесты;
+* тестирование HTTP-обработчиков.
+
+### Мониторинг
+
+📂 `monitoring/`
+
+Для мониторинга используются:
+
+* Prometheus;
+* Grafana.
+
+---
+
+# 🔐 JWT-аутентификация
+
+Для доступа к защищённым endpoint'ам используется JWT.
+
+Сначала пользователь выполняет авторизацию:
+
+```http
+POST /login
+```
+
+Пример запроса:
+
 ```json
 {
   "username": "alex",
   "password": "password123"
 }
 ```
-Пример запроса (Insomnia): 
-![Login Request](screenshots/login_request.png)
-Пример ответа:
+
+В ответ API возвращает JWT-токен:
 
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  "token": "eyJhbGciOiJIUzI1NiIs..."
 }
 ```
-### Create Task
-Метод: `POST /tasks`
-Описание: Создание новой задачи. Требует токен авторизации.
 
-Тело запроса:
+Полученный токен можно использовать для обращения к защищённым endpoint'ам:
+
+```http
+Authorization: Bearer <JWT-токен>
+```
+
+Это позволяет увидеть на практике полный цикл:
+
+```text
+Login
+  ↓
+JWT
+  ↓
+Authorization Header
+  ↓
+Protected API
+```
+
+---
+
+# 📋 Работа с задачами
+
+## Создание задачи
+
+```http
+POST /tasks
+```
+
+Пример:
 
 ```json
 {
@@ -179,9 +215,8 @@ Starting application...
   "status": "pending"
 }
 ```
-Пример запроса (Insomnia): 
-![Create Task Request](screenshots/create_task_request.png)
-Пример ответа:
+
+Ответ:
 
 ```json
 {
@@ -191,12 +226,19 @@ Starting application...
   "status": "pending"
 }
 ```
-### Get Tasks
-Метод: `GET /tasks`
-Описание: Получение списка всех задач пользователя. Требует токен авторизации.
 
-Пример запроса (Insomnia): 
-![Get Tasks Request](screenshots/get_tasks_request.png)
+## Получение задач
+
+```http
+GET /tasks
+```
+
+Для запроса требуется JWT:
+
+```http
+Authorization: Bearer <ваш_JWT_токен>
+```
+
 Пример ответа:
 
 ```json
@@ -209,143 +251,354 @@ Starting application...
   }
 ]
 ```
-### Работа с API через curl
-#### Login
+
+---
+
+# 🧪 Пример работы через curl
+
+## Авторизация
 
 ```bash
 curl -X POST http://localhost:8080/login \
   -H "Content-Type: application/json" \
   -d '{"username":"alex","password":"password123"}'
 ```
+
 Ответ:
+
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIsInR..."
+  "token": "eyJhbGciOiJIUzI1NiIs..."
 }
 ```
-#### Get Tasks
+
+## Получение задач
 
 ```bash
 curl http://localhost:8080/tasks \
   -H "Authorization: Bearer <ваш_JWT_токен>"
 ```
-Ответ:
 
-```json
-[
-  {"id":1,"title":"Test task","status":"todo"},
-  {"id":2,"title":"Test task","status":"todo"}
-]
+---
+
+# 📚 Swagger / OpenAPI
+
+API документировано с помощью Swagger.
+
+После запуска приложения документация доступна по адресу:
+
+```text
+http://localhost:8080/swagger/index.html
 ```
-## ⚙️ Подготовка окружения
-Создать .env:
-```
+
+Swagger позволяет:
+
+* увидеть доступные endpoint'ы;
+* изучить параметры запросов;
+* посмотреть модели данных;
+* увидеть ответы API;
+* отправлять запросы непосредственно из браузера.
+
+Таким образом, API можно изучать и тестировать без отдельного клиента.
+
+![Swagger](screenshots/swagger.png)
+
+---
+
+# 🗄 PostgreSQL и миграции
+
+Проект использует PostgreSQL для хранения пользователей и задач.
+
+Перед запуском создайте файл `.env`:
+
+```bash
 cp .env.example .env
 ```
-Пример .env:
-```INI
+
+Пример конфигурации:
+
+```ini
 DB_HOST=localhost
 DB_PORT=5432
 DB_USER=alex
 DB_PASSWORD=secret
 DB_NAME=restapi
 ```
-⚠️ Важно: .env не коммитится, хранит локальные секреты.
 
-Установить зависимости Go:
+> `.env` содержит локальные настройки и секреты, поэтому файл не должен добавляться в репозиторий.
 
-```bash
-go mod tidy
-```
-## Миграции
-Makefile — основные команды:
+## Основные команды миграций
 
 ```bash
-make run	Запуск приложения с миграциями
-make migrate-up	Применить новые миграции
-make migrate-down	Откатить последнюю миграцию
-make migrate-force VERSION=2	Принудительно установить версию миграций
-make migrate-reset	Полный сброс базы и повторное применение всех миграций
-```
-Пример работы
-```bash
-# Применить все миграции
 make migrate-up
 ```
-Откатить последнюю миграцию
+
+Применить новые миграции.
+
 ```bash
 make migrate-down
 ```
-Принудительно синхронизировать версию миграций
+
+Откатить последнюю миграцию.
+
 ```bash
-make migrate-force VERSION=1
+make migrate-force VERSION=2
 ```
-Сбросить базу и заново применить миграции
+
+Принудительно установить версию миграций.
+
 ```bash
 make migrate-reset
 ```
 
-## 📊 Мониторинг
-Grafana и Prometheus
+Сбросить базу и применить миграции заново.
+
+---
+
+# 🐳 Docker
+
+Для запуска инфраструктуры используется Docker Compose.
+
 ```bash
 docker compose up -d
+```
 
-Grafana: http://localhost:3000
-Логин: admin
-пароль: admin
+Docker позволяет быстрее подготовить окружение проекта и связанные сервисы.
 
+---
+
+# 📊 Мониторинг
+
+Проект содержит интеграцию с **Prometheus** и **Grafana**.
+
+После запуска:
+
+```bash
+docker compose up -d
+```
+
+можно использовать:
+
+```text
+Grafana:    http://localhost:3000
 Prometheus: http://localhost:9090
 ```
 
-##  📚 Документация Swagger
+Grafana используется для визуализации метрик, а Prometheus — для их сбора.
 
-API документировано с помощью Swagger (Swaggo).  
-После запуска сервера Swagger UI будет доступен по ссылке:
+В репозитории также находится готовый dashboard:
 
-[http://localhost:8080/swagger/index.html](http://localhost:8080/swagger/index.html)
+```text
+monitoring/dashboards/rest_api_dashboard.json
+```
 
-Здесь вы можете просматривать все эндпоинты, модели данных и тестировать API прямо из браузера.
-Для запуска сервера используйте команду:
+Это позволяет увидеть базовый вариант подключения мониторинга к Go REST API.
+
+---
+
+# 🧪 Тестирование
+
+Проект содержит несколько уровней тестирования.
+
+## Все тесты
+
+```bash
+go test ./... -v -count=1
+```
+
+## Тесты HTTP-сервера
+
+```bash
+go test ./internal/server -v -count=1
+```
+
+## Конкретный тест
+
+```bash
+go test ./internal/server -v -run TestTasksHandler
+```
+
+## Интеграционные тесты
+
+```bash
+go test ./internal/services/integration_test -v -count=1
+```
+
+## Конкретный интеграционный тест
+
+```bash
+go test ./internal/services/integration_test -v -run TestFullIntegration
+```
+
+## Unit-тесты
+
+```bash
+go test ./internal/services/unit -v -count=1
+```
+
+---
+
+# ▶️ Запуск проекта
+
+## 1. Клонировать репозиторий
+
+```bash
+git clone <URL_репозитория>
+cd go-rest-api-starter-jwt-postgresql
+```
+
+## 2. Создать `.env`
+
+```bash
+cp .env.example .env
+```
+
+Настройте параметры подключения к PostgreSQL.
+
+## 3. Установить зависимости
+
+```bash
+go mod tidy
+```
+
+## 4. Запустить миграции
+
+```bash
+make migrate-up
+```
+
+## 5. Запустить приложение
 
 ```bash
 go run ./cmd/main.go
 ```
-![Swagger](screenshots/swagger.png)
 
-## Тестирование
-Unit / Integration
-Запуск всех тестов 
-```bash
-go test ./... -v -count=1
+После запуска API будет доступно на:
+
+```text
+http://localhost:8080
 ```
-Запуск unit-теста хандлеров
-```bash
-go test ./internal/server -v -count=1
+
+Swagger:
+
+```text
+http://localhost:8080/swagger/index.html
 ```
-Запуск конкретного unit-теста
-```bash
-go test ./internal/server -v -run TestTasksHandler
+
+---
+
+# 📂 Структура проекта
+
+```text
+├── .github
+│   └── workflows
+├── cmd
+│   ├── main.go
+│   └── utils
+├── configs
+├── docs
+├── internal
+│   ├── auth
+│   ├── config
+│   ├── models
+│   ├── repositories
+│   ├── seed
+│   ├── server
+│   └── services
+│       ├── integration_test
+│       └── unit
+├── migrations
+├── monitoring
+│   └── dashboards
+├── screenshots
+├── Dockerfile
+├── docker-compose.yml
+├── Makefile
+├── prometheus.yml
+├── go.mod
+└── README.md
 ```
-Запуск всех интеграционных тестов
-```bash
-go test ./internal/services/integration_test -v -count=1
+
+---
+
+# 💡 Что можно использовать из проекта
+
+Этот репозиторий можно рассматривать как практический пример или стартовую основу.
+
+### Для обучения
+
+Изучить, как компоненты Go backend-приложения взаимодействуют между собой.
+
+### Для портфолио
+
+Показать работу с:
+
+* Go;
+* REST API;
+* PostgreSQL;
+* JWT;
+* Swagger;
+* Docker;
+* тестированием;
+* Prometheus;
+* Grafana.
+
+### Для собственного проекта
+
+Использовать структуру и отдельные технические решения как основу для нового REST API.
+
+Например, поверх текущей архитектуры можно реализовать:
+
+* систему заметок;
+* сервис проектов;
+* API для интернет-магазина;
+* CRM backend;
+* сервис управления пользователями;
+* внутренний корпоративный API.
+
+---
+
+# 🛠 Технологии
+
+* **Go**
+* **REST API**
+* **PostgreSQL**
+* **JWT**
+* **Swagger / OpenAPI**
+* **Docker / Docker Compose**
+* **Prometheus**
+* **Grafana**
+* **Unit Tests**
+* **Integration Tests**
+* **Makefile**
+* **GitHub Actions**
+
+---
+
+# 📌 Что демонстрирует проект
+
+Проект показывает не отдельный пример CRUD-методов, а полный набор практических задач, которые встречаются при создании backend API:
+
+```text
+HTTP API
+   ↓
+Authentication
+   ↓
+Validation
+   ↓
+Business Logic
+   ↓
+PostgreSQL
+   ↓
+Tests
+   ↓
+Documentation
+   ↓
+Monitoring
 ```
-Запуск конкретного интеграционного теста
-```bash
-go test ./internal/services/integration_test -v -run TestFullIntegration
-```
-Просмотр доступных тестов
-```bash
-go test ./internal/services/integration_test -list .
-```
-Unit-тесты
-```bash
-go test ./internal/services/unit -v -count=1
-```
-## ✅ Вывод
-💡 Основные навыки, продемонстрированные в проекте
-- Реализация многослойной архитектуры REST API на Go.
-- Unit- и интеграционное тестирование с моками.
-- Обработка ошибок и стандартизация JSON-ответов.
-- Структурирование кода для масштабируемых приложений.
-- Подготовка инструкций для локального запуска и тестирования.
+
+Поэтому репозиторий можно использовать как **практическую точку входа в разработку REST API на Go** и как основу для дальнейшего расширения собственного backend-сервиса.
+
+## 📄 Лицензия
+
+Проект распространяется согласно лицензии, указанной в файле `LICENSE`.
